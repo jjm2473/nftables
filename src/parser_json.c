@@ -2093,6 +2093,7 @@ static struct stmt *json_parse_nat_stmt(struct json_ctx *ctx,
 					const char *key, json_t *value)
 {
 	int type, familyval;
+	int fullcone = 0;
 	struct stmt *stmt;
 	json_t *tmp;
 
@@ -2109,7 +2110,13 @@ static struct stmt *json_parse_nat_stmt(struct json_ctx *ctx,
 	stmt = nat_stmt_alloc(int_loc, type);
 	stmt->nat.family = familyval;
 
-	if (!json_unpack(value, "{s:o}", "addr", &tmp)) {
+	if (NFT_NAT_MASQ == type && !json_unpack(root, "{s:b}", "fullcone", &fullcone)) {
+		if (fullcone) {
+			stmt->nat.addr = fullcone_expr_alloc(int_loc);
+		}
+	}
+
+	if (NFT_NAT_MASQ != type && !json_unpack(value, "{s:o}", "addr", &tmp)) {
 		stmt->nat.addr = json_parse_stmt_expr(ctx, tmp);
 		if (!stmt->nat.addr) {
 			json_error(ctx, "Invalid nat addr.");

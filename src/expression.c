@@ -808,6 +808,51 @@ struct expr *range_expr_alloc(const struct location *loc,
 	return expr;
 }
 
+static void fullcone_expr_print(const struct expr *expr, struct output_ctx *octx)
+{
+	nft_print(octx, "fullcone");
+}
+
+static void fullcone_expr_clone(struct expr *new, const struct expr *expr)
+{
+	new->left  = expr_clone(expr->left);
+	new->right = expr_clone(expr->right);
+}
+
+static void fullcone_expr_destroy(struct expr *expr)
+{
+	expr_free(expr->left);
+	expr_free(expr->right);
+}
+
+static const struct expr_ops fullcone_expr_ops = {
+	.type		= EXPR_FULLCONE,
+	.name		= "fullcone",
+	.print		= fullcone_expr_print,
+	.json		= fullcone_expr_json,
+	.clone		= fullcone_expr_clone,
+	.destroy	= fullcone_expr_destroy,
+};
+
+struct expr *fullcone_expr_alloc(const struct location *loc)
+{
+	struct expr *expr;
+	int one = 1;
+	int zero = 0;
+
+	expr = expr_alloc(loc, EXPR_FULLCONE, &invalid_type,
+			  BYTEORDER_INVALID, 0);
+	expr->left  = constant_expr_alloc(loc, &integer_type,
+								BYTEORDER_HOST_ENDIAN,
+								sizeof(int) *
+								BITS_PER_BYTE, &one);
+	expr->right = constant_expr_alloc(loc, &integer_type,
+								BYTEORDER_HOST_ENDIAN,
+								sizeof(int) *
+								BITS_PER_BYTE, &zero);;
+	return expr;
+}
+
 struct expr *compound_expr_alloc(const struct location *loc,
 				 enum expr_types etype)
 {
@@ -1489,6 +1534,7 @@ static const struct expr_ops *__expr_ops_by_type(enum expr_types etype)
 	case EXPR_VALUE: return &constant_expr_ops;
 	case EXPR_PREFIX: return &prefix_expr_ops;
 	case EXPR_RANGE: return &range_expr_ops;
+	case EXPR_FULLCONE: return &fullcone_expr_ops;
 	case EXPR_PAYLOAD: return &payload_expr_ops;
 	case EXPR_EXTHDR: return &exthdr_expr_ops;
 	case EXPR_META: return &meta_expr_ops;

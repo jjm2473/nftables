@@ -2288,6 +2288,8 @@ static int expr_evaluate(struct eval_ctx *ctx, struct expr **expr)
 		return expr_evaluate_prefix(ctx, expr);
 	case EXPR_RANGE:
 		return expr_evaluate_range(ctx, expr);
+	case EXPR_FULLCONE:
+		return 0;
 	case EXPR_UNARY:
 		return expr_evaluate_unary(ctx, expr);
 	case EXPR_BINOP:

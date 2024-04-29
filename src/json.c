@@ -525,6 +525,11 @@ json_t *range_expr_json(const struct expr *expr, struct output_ctx *octx)
 	return root;
 }
 
+json_t *fullcone_expr_json(const struct expr *expr, struct output_ctx *octx)
+{
+	return json_pack("{s:n}", "fullcone");
+}
+
 json_t *meta_expr_json(const struct expr *expr, struct output_ctx *octx)
 {
 	return json_pack("{s:{s:s}}", "meta",
@@ -1359,6 +1364,10 @@ json_t *nat_stmt_json(const struct stmt *stmt, struct output_ctx *octx)
 	json_t *root = json_object();
 	json_t *array = nat_flags_json(stmt->nat.flags);
 
+	if (NFT_NAT_MASQ == stmt->nat.type && stmt->nat.addr && stmt->nat.addr->etype == EXPR_FULLCONE) {
+		json_object_set_new(root, "fullcone", json_true());
+	}
+	
 	switch (stmt->nat.family) {
 	case NFPROTO_IPV4:
 	case NFPROTO_IPV6:
@@ -1367,7 +1376,7 @@ json_t *nat_stmt_json(const struct stmt *stmt, struct output_ctx *octx)
 		break;
 	}
 
-	if (stmt->nat.addr)
+	if (NFT_NAT_MASQ != stmt->nat.type && stmt->nat.addr)
 		json_object_set_new(root, "addr",
 				    expr_print_json(stmt->nat.addr, octx));
 
