@@ -1358,6 +1358,13 @@ static void netlink_parse_masq(struct netlink_parse_ctx *ctx,
 			proto = range_expr_alloc(loc, stmt->nat.proto, proto);
 		stmt->nat.proto = proto;
 	}
+	reg1 = netlink_parse_register(nle, NFTNL_EXPR_NAT_REG_ADDR_MIN);
+	reg2 = netlink_parse_register(nle, NFTNL_EXPR_NAT_REG_ADDR_MAX);
+	if (reg2 && reg2 != reg1) {
+		if (NULL != netlink_get_register(ctx, loc, reg1)) {
+			stmt->nat.addr = fullcone_expr_alloc(loc);
+		}
+	}
 
 	ctx->stmt = stmt;
 	return;
@@ -2626,6 +2633,7 @@ static void expr_postprocess(struct rule_pp_ctx *ctx, struct expr **exprp)
 	case EXPR_EXTHDR:
 		exthdr_dependency_kill(&ctx->pdctx, expr, ctx->pctx.family);
 		break;
+	case EXPR_FULLCONE:
 	case EXPR_SET_REF:
 	case EXPR_META:
 	case EXPR_RT:

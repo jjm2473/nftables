@@ -658,7 +658,10 @@ const char *nat_etype2str(enum nft_nat_etypes type)
 static void nat_stmt_print(const struct stmt *stmt, struct output_ctx *octx)
 {
 	nft_print(octx, "%s", nat_etype2str(stmt->nat.type));
-	if (stmt->nat.addr || stmt->nat.proto) {
+	if (NFT_NAT_MASQ == stmt->nat.type && stmt->nat.addr && stmt->nat.addr->etype == EXPR_FULLCONE) {
+		nft_print(octx, " fullcone");
+	}
+	if ((NFT_NAT_MASQ != stmt->nat.type && stmt->nat.addr) || stmt->nat.proto) {
 		switch (stmt->nat.family) {
 		case NFPROTO_IPV4:
 			nft_print(octx, " ip");
@@ -674,7 +677,7 @@ static void nat_stmt_print(const struct stmt *stmt, struct output_ctx *octx)
 		nft_print(octx, " to");
 	}
 
-	if (stmt->nat.addr) {
+	if (NFT_NAT_MASQ != stmt->nat.type && stmt->nat.addr) {
 		nft_print(octx, " ");
 		if (stmt->nat.proto) {
 			if (stmt->nat.addr->etype == EXPR_VALUE &&
@@ -698,7 +701,7 @@ static void nat_stmt_print(const struct stmt *stmt, struct output_ctx *octx)
 	}
 
 	if (stmt->nat.proto) {
-		if (!stmt->nat.addr)
+		if (!stmt->nat.addr || NFT_NAT_MASQ == stmt->nat.type)
 			nft_print(octx, " ");
 		nft_print(octx, ":");
 		expr_print(stmt->nat.proto, octx);

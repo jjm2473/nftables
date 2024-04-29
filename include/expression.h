@@ -22,6 +22,7 @@
  * @EXPR_VALUE:		literal numeric or string expression
  * @EXPR_PREFIX:	prefixed expression
  * @EXPR_RANGE:		literal range
+ * @EXPR_FULLCONE:	fullcone-nat for masquerade
  * @EXPR_PAYLOAD:	payload expression
  * @EXPR_EXTHDR:	exthdr expression
  * @EXPR_META:		meta expression
@@ -50,6 +51,7 @@ enum expr_types {
 	EXPR_VALUE,
 	EXPR_PREFIX,
 	EXPR_RANGE,
+	EXPR_FULLCONE,
 	EXPR_PAYLOAD,
 	EXPR_EXTHDR,
 	EXPR_META,
@@ -469,6 +471,8 @@ extern struct expr *prefix_expr_alloc(const struct location *loc,
 extern struct expr *range_expr_alloc(const struct location *loc,
 				     struct expr *low, struct expr *high);
 struct expr *range_expr_to_prefix(struct expr *range);
+
+extern struct expr *fullcone_expr_alloc(const struct location *loc);
 
 extern struct expr *compound_expr_alloc(const struct location *loc,
 					enum expr_types etypes);

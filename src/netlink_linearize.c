@@ -1159,7 +1159,7 @@ static void netlink_gen_nat_stmt(struct netlink_linearize_ctx *ctx,
 		amin_reg = get_register(ctx, NULL);
 		registers++;
 
-		if (stmt->nat.addr->etype == EXPR_RANGE) {
+		if (stmt->nat.addr->etype == EXPR_RANGE || stmt->nat.addr->etype == EXPR_FULLCONE) {
 			amax_reg = get_register(ctx, NULL);
 			registers++;
 
