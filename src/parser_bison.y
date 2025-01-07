@@ -643,6 +643,7 @@ int nft_lex(void *, void *, void *);
 %token SNAT			"snat"
 %token DNAT			"dnat"
 %token MASQUERADE		"masquerade"
+%token FULLCONE		"fullcone"
 %token REDIRECT			"redirect"
 %token RANDOM			"random"
 %token FULLY_RANDOM		"fully-random"
@@ -3988,11 +3989,19 @@ nat_stmt_args		:	stmt_expr
 			}
 			;
 
-masq_stmt		:	masq_stmt_alloc		masq_stmt_args
+masq_stmt		:	masq_stmt_alloc		masq_stmt_fullcone	masq_stmt_args
+			| 	masq_stmt_alloc		masq_stmt_fullcone
+			|	masq_stmt_alloc		masq_stmt_args
 			|	masq_stmt_alloc
 			;
 
 masq_stmt_alloc		:	MASQUERADE	{ $$ = nat_stmt_alloc(&@$, NFT_NAT_MASQ); }
+			;
+
+masq_stmt_fullcone	:	FULLCONE
+			{
+				$<stmt>0->nat.addr = fullcone_expr_alloc(&@$);
+			}
 			;
 
 masq_stmt_args		:	TO 	COLON	stmt_expr

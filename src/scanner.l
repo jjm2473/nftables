@@ -463,6 +463,7 @@ addrstring	({macaddr}|{ip4addr}|{ip6addr})
 "dnat"			{ scanner_push_start_cond(yyscanner, SCANSTATE_STMT_NAT); return DNAT; }
 "masquerade"		{ scanner_push_start_cond(yyscanner, SCANSTATE_STMT_NAT); return MASQUERADE; }
 "redirect"		{ scanner_push_start_cond(yyscanner, SCANSTATE_STMT_NAT); return REDIRECT; }
+"fullcone"		{ return FULLCONE; }
 "random"		{ return RANDOM; }
 <SCANSTATE_STMT_NAT>{
 	"fully-random"		{ return FULLY_RANDOM; }

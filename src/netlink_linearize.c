@@ -1241,6 +1241,9 @@ static void netlink_gen_nat_stmt(struct netlink_linearize_ctx *ctx,
 	if (stmt->nat.flags != 0)
 		nftnl_expr_set_u32(nle, nftnl_flag_attr, stmt->nat.flags);
 
+	if (stmt->nat.addr && stmt->nat.addr->etype == EXPR_FULLCONE) {
+		nftnl_expr_set_u8(nle, NFTNL_EXPR_MASQ_REG_FULLCONE, 1);
+	} else
 	if (stmt->nat.addr) {
 		amin_reg = get_register(ctx, NULL);
 		registers++;

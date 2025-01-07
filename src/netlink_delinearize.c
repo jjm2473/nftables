@@ -1435,6 +1435,10 @@ static void netlink_parse_masq(struct netlink_parse_ctx *ctx,
 	stmt = nat_stmt_alloc(loc, NFT_NAT_MASQ);
 	stmt->nat.flags = flags;
 
+	if (nftnl_expr_is_set(nle, NFTNL_EXPR_MASQ_REG_FULLCONE))
+		if (nftnl_expr_get_u8(nle, NFTNL_EXPR_MASQ_REG_FULLCONE))
+			stmt->nat.addr = fullcone_expr_alloc(loc);
+
 	reg1 = netlink_parse_register(nle, NFTNL_EXPR_MASQ_REG_PROTO_MIN);
 	if (reg1) {
 		proto = netlink_get_register(ctx, loc, reg1);
@@ -2912,6 +2916,7 @@ static void expr_postprocess(struct rule_pp_ctx *ctx, struct expr **exprp)
 	case EXPR_EXTHDR:
 		exthdr_dependency_kill(&dl->pdctx, expr, dl->pctx.family);
 		break;
+	case EXPR_FULLCONE:
 	case EXPR_SET_REF:
 	case EXPR_META:
 	case EXPR_RT:
